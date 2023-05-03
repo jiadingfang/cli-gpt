@@ -50,6 +50,7 @@ if __name__ == '__main__':
     print('Type "exit" to exit the dialogue')
     print('Type "reset" to reset the dialogue')
     print('Type "pretext" to see the current dialogue history')
+    print('Type "save" to save the current dialogue history')
     print('====GPT Dialogue Initialized, start asking your questions====')
 
     while True:
