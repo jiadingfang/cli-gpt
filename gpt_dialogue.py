@@ -5,13 +5,20 @@ import openai
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 class Dialogue:
-    def __init__(self, model='gpt-4', temperature='0', max_tokens='10', system_message='', save_path='chats'):
+    def __init__(self,model='gpt-4', temperature='0', max_tokens='10', system_message='', load_path=None, save_path='chats'):
         self.model = model
         self.temperature = temperature
         self.max_tokens = max_tokens
         self.system_message = system_message
         self.save_path = save_path
-        self.pretext = [{"role": "system", "content": self.system_message}]
+        if load_path is not None:
+            self.load_pretext(load_path)
+        else:
+            self.pretext = [{"role": "system", "content": self.system_message}]
+
+    def load_pretext(self, load_path):
+        with open(load_path) as json_file:
+            self.pretext = json.load(json_file)
 
     def get_pretext(self):
         return self.pretext
@@ -41,7 +48,8 @@ if __name__ == '__main__':
         'model': 'gpt-3.5-turbo',
         'temperature': 0,
         'max_tokens': 'inf',
-        'sytem_message': '',
+        'system_message': '',
+        'load_path': 'chats/dialogue_maze_navigation.json',
         'save_path': 'chats',
     }
 
@@ -58,7 +66,7 @@ if __name__ == '__main__':
         if user_prompt == 'exit':
             break
         elif user_prompt == 'reset':
-            dialogue = Dialogue()
+            dialogue = Dialogue(**config)
             print('====GPT Dialogue Initialized, start asking your questions====')
             continue
         elif user_prompt == 'pretext':
