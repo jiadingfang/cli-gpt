@@ -6,19 +6,20 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
 class Dialogue:
-    def __init__(self, model='gpt-4', temperature='0', max_tokens='10', system_message='', load_path=None, save_path='chats'):
+    def __init__(self, model='gpt-4', temperature='0', max_tokens='10', system_message='', load_path=None, save_path='chats', debug=True):
         self.model = model
         self.temperature = temperature
         self.max_tokens = max_tokens
         self.system_message = system_message
         self.save_path = save_path
+        self.debug = debug
         if load_path is not None:
             self.load_pretext(load_path)
         else:
             self.pretext = [{"role": "system", "content": self.system_message}]
 
     def load_pretext(self, load_path):
-        
+
         def load_json(load_path):
             with open(load_path) as json_file:
                 return json.load(json_file)
@@ -49,6 +50,8 @@ class Dialogue:
             model=self.model,
             messages=self.pretext + user_message,
         )
+        if self.debug:
+            print('completion: ', completion)
         assistant_response = completion.choices[0].message
         self.pretext = self.pretext + user_message + [assistant_response]
         return assistant_response
@@ -57,11 +60,13 @@ class Dialogue:
 if __name__ == '__main__':
 
     config = {
-        'model': 'gpt-4',
+        # 'model': 'gpt-4',
+        'model': 'gpt-3.5-turbo',
         'temperature': 0,
         'max_tokens': 'inf',
         'system_message': '',
-        'load_path': 'chats/zork_70.json',
+        # 'load_path': 'chats/zork_70.json',
+        'load_path': ['chats/zork_70.json', 'chats/action_space.json', 'chats/place_names.json'],
         'save_path': 'chats',
     }
 
