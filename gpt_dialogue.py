@@ -6,7 +6,7 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
 class Dialogue:
-    def __init__(self, model='gpt-4', temperature='0', max_tokens='10', system_message='', load_path=None, save_path='chats', debug=True):
+    def __init__(self, model='gpt-4', temperature='0', max_tokens='10', system_message='', load_path=None, save_path='chats', debug=False):
         self.model = model
         self.temperature = temperature
         self.max_tokens = max_tokens
