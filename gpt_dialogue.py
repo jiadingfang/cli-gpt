@@ -71,12 +71,11 @@ if __name__ == '__main__':
     }
 
     dialogue = Dialogue(**config)
-    print('===Config===')
-    print(config)
-    print('===Config===')
+    print('======================Instructions======================')
     print('Type "exit" to exit the dialogue')
     print('Type "reset" to reset the dialogue')
     print('Type "pretext" to see the current dialogue history')
+    print('Type "config" to see the current config')
     print('Type "save" to save the current dialogue history')
     print('====GPT Dialogue Initialized, start asking your questions====')
 
@@ -93,6 +92,11 @@ if __name__ == '__main__':
             for message in dialogue.get_pretext():
                 print(message)
             print('===Pretext===')
+            continue
+        elif user_prompt == 'config':
+            print('===Config===')
+            print(config)
+            print('===Config===')
             continue
         elif user_prompt == 'save':
             timestamp = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
