@@ -6,9 +6,10 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
 class Dialogue:
-    def __init__(self, model='gpt-4', temperature='0', max_tokens='10', system_message='', load_path=None, save_path='chats', debug=False):
+    def __init__(self, model='gpt-4', temperature=0, top_p=0.1, max_tokens=10, system_message='', load_path=None, save_path='chats', debug=False):
         self.model = model
         self.temperature = temperature
+        self.top_p = top_p
         self.max_tokens = max_tokens
         self.system_message = system_message
         self.save_path = save_path
@@ -49,6 +50,8 @@ class Dialogue:
         completion = openai.ChatCompletion.create(
             model=self.model,
             messages=self.pretext + user_message,
+            temperature=self.temperature,
+            top_p=self.top_p,
         )
         if self.debug:
             print('completion: ', completion)
@@ -60,14 +63,15 @@ class Dialogue:
 if __name__ == '__main__':
 
     config = {
-        # 'model': 'gpt-4',
-        'model': 'gpt-3.5-turbo',
+        'model': 'gpt-4',
+        # 'model': 'gpt-3.5-turbo',
         'temperature': 0,
+        'top_p': 0.1,
         'max_tokens': 'inf',
         'system_message': '',
-        # 'load_path': 'chats/zork_70.json',
-        'load_path': ['chats/zork_70.json', 'chats/action_space.json', 'chats/place_names.json'],
+        # 'load_path': 'chats/dialogue_an apple.json',
         'save_path': 'chats',
+        'debug': False
     }
 
     dialogue = Dialogue(**config)
