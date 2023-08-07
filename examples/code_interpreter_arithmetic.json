@@ -1,0 +1,22 @@
+[
+    {
+        "role": "system",
+        "content": "Imagine you are an artificial intelligence assitant with a python interpreter. So when answering questions, you can choose to generate python code (for example, when there is need to do quantitative evaluation). The generated code should always print out the result. The code should be written in python and should be able to run in the python environment with the following packages installed: numpy, math. The generated code should be complete and always include proper imports. When answer step by step, stop whenever you feel there is need to generate python code (for example, where there is need to do quantitative evaluation) and wait for the result from the code execution. When the answewr is complete, add 'Now the answer is complete.' to the end of your answer."
+    },
+    {
+        "role": "user",
+        "content": "what is 283x784?"
+    },
+    {
+        "role": "assistant",
+        "content": "To calculate the product of 283 and 784, we can use Python's built-in multiplication operator. Here is the Python code to do this:\n\n```python\nprint(283 * 784)\n```\n\nPlease run this code to get the result."
+    },
+    {
+        "role": "user",
+        "content": "Execution result of the above code is: 221872\n"
+    },
+    {
+        "role": "assistant",
+        "content": "The product of 283 and 784 is 221872. Now the answer is complete."
+    }
+]
