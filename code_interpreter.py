@@ -1,10 +1,9 @@
-import os, datetime
-import numpy, math
+import os, datetime, math
+import numpy as np
 from io import StringIO
 from contextlib import redirect_stdout
 import openai
 from gpt_dialogue import Dialogue
-# from question_completion_check import question_completion_check
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 class CodeInterpreter(Dialogue):
@@ -13,49 +12,26 @@ class CodeInterpreter(Dialogue):
         super().__init__(**kwargs)
 
     def call_openai_with_code_interpreter(self, user_prompt):
-        # call openai with potential code interpreter
-        # user_prompt += '\nStop whenever you feel there is need to generate python code (for example, when there is need to do quantitative evaluation) and wait for the result from the code execution.'
-        # user_message = [{"role": "user", "content": user_prompt}]
-        # completion = openai.ChatCompletion.create(
-        #     model=self.model,
-        #     messages=self.pretext + user_message,
-        #     temperature=self.temperature,
-        #     top_p=self.top_p,
-        #     max_tokens=self.max_tokens,
-        # )
         assistant_response = self.call_openai(user_prompt)
 
         # check if response contain code snippet
         response_content = assistant_response['content']
-        # if self.debug:
-        #     print('response_content: ', response_content)
+        if self.debug:
+            print('response_content: ', response_content)
         response_splits = response_content.split('```python')
         if len(response_splits) <= 1:
             # no code snippet found, return the raw response
-            # if self.debug:
-            #     print('no code snippet found, return the raw response')
+            if self.debug:
+                print('no code snippet found, return the raw response')
             return assistant_response
-        
-        # elif len(response_splits) % 2 == 0:
-        #     warning_msg = 'Irregular structued code returned, there should be an even number of code brackets (```)'
-        #     print(warning_msg)
-        #     return self.call_openai_with_code_interpreter(warning_msg)
-        
         else:
             # code snippet found, execute the code
             code_snippet = response_splits[-1].split('```')[0]
-            # code_snippet = response_splits[-2]
-            # if self.debug:
-            #     print('code snippet: ', code_snippet)
             print('code snippet: ', code_snippet)
-            # code_exe_result = exec(code_snippet)
-            # exec(code_snippet)
             f = StringIO()
             with redirect_stdout(f):
                 exec(code_snippet)
             code_exe_result = f.getvalue()
-            # if self.debug:
-                # print('code execution result: ', code_exe_result)
             print('code execution result: ', code_exe_result)
             code_exe_msg = 'Execution result of the above code is: ' + str(code_exe_result)
             return self.call_openai_with_code_interpreter(code_exe_msg)
@@ -68,13 +44,12 @@ if __name__ == '__main__':
         'temperature': 0,
         'top_p': 0.0,
         'max_tokens': 'inf',
-        'system_message': 'Imagine you are an artificial intelligence assitant with a python interpreter. So when answering questions, you can choose to generate python code (for example, when there is need to do quantitative evaluation) and wait for the result from the code execution. The generated code should always print out the result. The code should be written in python and should be able to run in the python environment with the following packages installed: numpy, math',
-        'load_path': 'chats/scene0536_01.json',
+        'system_message': "Imagine you are an artificial intelligence assitant with a python interpreter. So when answering questions, you can choose to generate python code (for example, when there is need to do quantitative evaluation). The generated code should always print out the result. The code should be written in python and should be able to run in the python environment with the following packages installed: numpy, math. The generated code should be complete and always include proper imports. Each generated code piece should be independent and not rely on previous generated code. When answer step by step, stop whenever you feel there is need to generate python code (for example, where there is need to do quantitative evaluation) and wait for the result from the code execution. When the answewr is complete, add 'Now the answer is complete.' to the end of your answer.",
+        # 'load_path': '',
         'save_path': 'chats',
         'debug': False
     }
 
-    # dialogue = Dialogue(**config)
     dialogue = CodeInterpreter(**config)
     print('======================Instructions======================')
     print('Type "exit" to exit the dialogue')
@@ -89,7 +64,6 @@ if __name__ == '__main__':
         if user_prompt == 'exit':
             break
         elif user_prompt == 'reset':
-            # dialogue = Dialogue(**config)
             dialogue = CodeInterpreter(**config)
             print('====GPT Dialogue Initialized, start asking your questions====')
             continue
@@ -115,7 +89,6 @@ if __name__ == '__main__':
             response = dialogue.call_openai_with_code_interpreter(user_prompt)['content']
             print('Bot:', response)
             counter = 0
-            # while not question_completion_check(user_prompt, response):
             while not response.endswith('Now the answer is complete.') and counter < 10:
                 response = dialogue.call_openai_with_code_interpreter('')['content']
                 print('Bot:', response)
