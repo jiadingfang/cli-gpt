@@ -4,10 +4,16 @@ import datetime
 import openai
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
+HUGGINGFACE_MODELS = {
+    'meta-llama/Llama-2-7b-chat-hf',
+    'meta-llama/Llama-2-13b-chat-hf',
+    'meta-llama/Llama-2-70b-chat-hf'
+}
+
 
 class Dialogue:
-    def __init__(self, model='gpt-4', temperature=0, top_p=0.1, max_tokens=10, system_message='', load_path=None, save_path='chats', debug=False):
-        self.model = model
+    def __init__(self, model='gpt-4', temperature=0, top_p=0.1, max_tokens=100, system_message='', load_path=None, save_path='chats', debug=False):
+        self.model_name = model
         self.temperature = temperature
         self.top_p = top_p
         self.max_tokens = max_tokens
@@ -18,6 +24,16 @@ class Dialogue:
             self.load_pretext(load_path)
         else:
             self.pretext = [{"role": "system", "content": self.system_message}]
+        
+        if model in HUGGINGFACE_MODELS:
+            from hf_conversational import HuggingfaceConversational
+            from transformers import Conversation
+            self.conversational = HuggingfaceConversational(
+                model_name=self.model_name,
+                temperature=self.temperature,
+                top_p=self.top_p,
+                max_length=self.max_tokens
+            )
 
     def load_pretext(self, load_path):
 
@@ -47,31 +63,41 @@ class Dialogue:
 
     def call_openai(self, user_prompt):
         user_message = [{"role": "user", "content": user_prompt}]
-        completion = openai.ChatCompletion.create(
-            model=self.model,
-            messages=self.pretext + user_message,
-            temperature=self.temperature,
-            top_p=self.top_p,
-        )
-        if self.debug:
-            print('completion: ', completion)
-        assistant_response = completion.choices[0].message
-        self.pretext = self.pretext + user_message + [assistant_response]
-        return assistant_response
+        messages = self.pretext + user_message
+        if self.model_name in ['gpt-4', 'gpt-3.5-turbo']:
+            completion = openai.ChatCompletion.create(
+                model=self.model_name,
+                messages=messages,
+                temperature=self.temperature,
+                top_p=self.top_p,
+            )
+            if self.debug:
+                print('completion: ', completion)
+            assistant_response_message = completion.choices[0].message
+        elif self.model_name in HUGGINGFACE_MODELS:
+            assistant_response_message = self.conversational(messages).messages[-1]
+        else:
+            raise Exception('model name {} not supported'.format(self.model_name))
+        
+        self.pretext = self.pretext + user_message + [assistant_response_message]
+        return assistant_response_message
 
 
 if __name__ == '__main__':
 
     config = {
-        'model': 'gpt-4',
+        # 'model': 'meta-llama/Llama-2-70b-chat-hf',
+        'model': 'meta-llama/Llama-2-7b-chat-hf',
+        # 'model': 'gpt-4',
         # 'model': 'gpt-3.5-turbo',
         'temperature': 0,
-        'top_p': 0.1,
-        'max_tokens': 'inf',
+        'top_p': 0.0,
+        'max_tokens': 512,
         'system_message': '',
         # 'load_path': 'chats/dialogue_an apple.json',
         'save_path': 'chats',
-        'debug': False
+        'debug': False,
+        # 'debug': True,
     }
 
     dialogue = Dialogue(**config)
