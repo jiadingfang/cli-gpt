@@ -53,13 +53,14 @@ class HuggingfaceConversational:
 
 if __name__=="__main__":
     # check out https://github.com/facebookresearch/llama/blob/main/llama/generation.py#L212 to see what's the best format for llama2 chat model
-    # model_name = 'meta-llama/Llama-2-7b-chat-hf'
+    model_name = 'meta-llama/Llama-2-7b-chat-hf'
     # model_name = 'meta-llama/Llama-2-7b-hf'
     # model_name = 'meta-llama/Llama-2-13b-chat-hf'
     # model_name = 'meta-llama/Llama-2-13b-hf'
     # model_name = 'meta-llama/Llama-2-70b-chat-hf'
-    # model_name = 'codellama/CodeLlama-13b-Python-hf'
-    model_name = 'codellama/CodeLlama-34b-Python-hf'
+    # model_name = 'codellama/CodeLlama-34b-Instruct-hf' # not ready yet
+    # model_name = 'codellama/CodeLlama-13b-Python-hf' # not ready yet
+    # model_name = 'codellama/CodeLlama-34b-Python-hf' # not ready yet
     # model_name = 'mistralai/Mistral-7B-Instruct-v0.1' # not ready yet, look at https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1
     # model_name = 'mistralai/Mistral-7B-v0.1' # not ready yet, look at https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.1
     model = HuggingfaceConversational(model_name)
